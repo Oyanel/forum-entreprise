@@ -1,0 +1,10 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+#IDE
+/.idea
+
+#config
+config.json
