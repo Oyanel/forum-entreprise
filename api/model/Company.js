@@ -4,13 +4,14 @@ let Schema = mongoose.Schema;
 
 
 let CompanySchema = new Schema({
-    id: {
-        type: Number,
-        required: 'Identifiant manquant'
+    _id: {
+        type: Schema.ObjectId,
+        required: true,
+        auto: true
     },
     name: {
         type: String,
-        required: 'Entrez le nom de votre Entreprise'
+        required: true
     },
     description: {
         type: String

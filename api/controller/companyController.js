@@ -2,7 +2,6 @@
 let mongoose = require('mongoose'),
     Company = mongoose.model('Company');
 
-
 /**
  * List all companies
  *
@@ -38,8 +37,8 @@ exports.create_company = (req, res) => {
  * @param req
  * @param res
  */
-exports.get_company = function (req, res) {
-    company.findById(req.params.companyId, (err, company) => {
+exports.get_company = (req, res) => {
+    Company.findById(req.params.companyId, (err, company) => {
         if (err)
             res.send(err);
         res.json(company);
@@ -53,7 +52,7 @@ exports.get_company = function (req, res) {
  * @param res
  */
 exports.update_company = (req, res) => {
-    company.findOneAndUpdate({_id: req.params.companyId}, req.body, {new: true}, (err, company) => {
+    Company.findOneAndUpdate({_id: req.params.companyId}, req.body, {new: true}, (err, company) => {
         if (err)
             res.send(err);
         res.json(company);
@@ -68,13 +67,14 @@ exports.update_company = (req, res) => {
  * @param res
  */
 exports.delete_company = (req, res) => {
-    company.remove({
-        _id: req.params.companyId
-    }, function (err, company) {
-        if (err)
-            res.send(err);
-        res.json({message: 'Entreprise supprimée'});
-    });
+    Company.deleteOne({
+            _id: req.params.companyId
+        },
+        (err, company) => {
+            if (err)
+                res.send(err);
+            res.json({message: 'Entreprise supprimée'});
+        });
 };
 
 

@@ -4,17 +4,18 @@ let Schema = mongoose.Schema;
 
 
 let ApplicantSchema = new Schema({
-    id: {
-        type: Number,
-        required: 'Identifiant manquant'
+    _id: {
+        type: Schema.ObjectId,
+        required: true,
+        auto: true,
     },
     last_name: {
         type: String,
-        required: 'Entrez votre nom'
+        required: true
     },
     first_name: {
         type: String,
-        required: 'Entrez votre prenom'
+        required: true
     },
     description: {
         type: String

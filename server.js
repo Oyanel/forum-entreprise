@@ -1,25 +1,32 @@
 let express = require('express'),
-    mongoose = require('mongoose'),
-    bodyParser = require('body-parser'),
-    config = require('./config');
+    bodyParser = require('body-parser');
 
 /* routes */
-let routes = require('./api/routes/companyRoute');
+let routes = require('./api/routes');
 
-/* models */
-let Company = require('./api/model/Company');
+/* mongodb */
+const {Connection} = require('./api/helper/mongodb');
+
 
 let app = express();
 let port = process.env.PORT || 3000;
 
-/* Mongo instance */
-mongoose.Promise = global.Promise;
-mongoose.connect(config.mongodb.url);
+/* models */
+let Company = require('./api/model/Company');
+let Applicant = require('./api/model/Applicant');
+
+Connection.connectToMongo();
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
 routes(app);
+
+app.use(function(req, res) {
+    res.status(404).send({url: req.originalUrl + ' not found'})
+});
+
 app.listen(port);
 
-
-console.log('server running on : ' + port);
+console.log('server running on localhost:' + port);
