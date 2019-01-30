@@ -6,27 +6,28 @@
  * @param app
  */
 module.exports = (app) => {
-    let company = require('../controller/companyController');
-    let applicant = require('../controller/applicantController');
+    let user = require('../controller/userController'),
+        meeting = require('../controller/meetingController');
 
-    /* Company routes */
 
-    app.route('/companies')
-        .get(company.list_companies)
-        .post(company.create_company);
+    /* User routes */
+    app.route('/users')
+        .get(user.list_users)
+        .post(user.create_user);
 
-    app.route('/companies/:companyId')
-        .get(company.get_company)
-        .put(company.update_company)
-        .delete(company.delete_company);
+    app.route('/users/:userId')
+        .get(user.get_user)
+        .put(user.update_user)
+        .delete(user.delete_user);
 
-    /* Applicant */
-    app.route('/applicants')
-        .get(applicant.list_applicants)
-        .post(applicant.create_applicant);
+    /* Meeting */
 
-    app.route('/applicants/:applicantId')
-        .get(applicant.get_applicant)
-        .put(applicant.update_applicant)
-        .delete(applicant.delete_applicant);
+    app.route('/meetings')
+        .get(meeting.list_meetings)
+        .post(meeting.create_meeting);
+
+    app.route('/meetings/:meetingId')
+        .get(meeting.get_meeting)
+        .put(meeting.update_meeting)
+        .delete(meeting.delete_meeting);
 };

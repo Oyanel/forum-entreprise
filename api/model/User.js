@@ -17,17 +17,15 @@ let UserSchema = new Schema({
         type: String,
         required: true
     },
-    _account: {
-        type: Schema.Types.ObjectId,
+    account: {
+        type: Object,
         required: true,
-        // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
-        // will look at the `onModel` property to find the right model.
-        refPath: 'externalModelType'
+        default: {}
     },
-    externalModelType: {
+    user_type: {
         type: String,
         required: true,
-        enum: ['Applicant', 'Company']
+        enum: ['Applicant', 'Company','Administrator']
     },
 });
 

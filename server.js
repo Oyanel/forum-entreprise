@@ -12,18 +12,17 @@ let app = express();
 let port = process.env.PORT || 3000;
 
 /* models */
-let Company = require('./api/model/Company');
-let Applicant = require('./api/model/Applicant');
+let User = require('./api/model/User'),
+    Meeting = require('./api/model/Meeting');
 
 Connection.connectToMongo();
-
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 routes(app);
 
-app.use(function(req, res) {
+app.use(function (req, res) {
     res.status(404).send({url: req.originalUrl + ' not found'})
 });
 
