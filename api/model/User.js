@@ -1,7 +1,6 @@
 'use strict';
-let mongoose = require('mongoose');
-let Schema = mongoose.Schema;
-
+let mongoose = require('mongoose'),
+    Schema = mongoose.Schema;
 
 let UserSchema = new Schema({
     _id: {
@@ -22,10 +21,14 @@ let UserSchema = new Schema({
         required: true,
         default: {}
     },
+    wish_list: {
+        type: Array,
+        default: []
+    },
     user_type: {
         type: String,
         required: true,
-        enum: ['Applicant', 'Company','Administrator']
+        enum: ['Applicant', 'Company', 'Administrator']
     },
 });
 

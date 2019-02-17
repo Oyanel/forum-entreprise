@@ -1,6 +1,7 @@
 'use strict';
 let mongoose = require('mongoose'),
-    Meeting = mongoose.model('Meeting');
+    Meeting = mongoose.model('Meeting'),
+    Meetings = require('../model/Meetings');
 
 /**
  * List all meetings
@@ -9,26 +10,22 @@ let mongoose = require('mongoose'),
  * @param res
  */
 exports.list_meetings = (req, res) => {
-    Meeting.find({}, (err, meeting) => {
+    Meeting.find({}, (err, meetings) => {
         if (err)
             res.send(err);
-        res.json(meeting);
+        res.json(meetings);
     });
 };
 
 /**
- * Create a meeting
+ * Plannify meetings
  *
  * @param req
  * @param res
  */
-exports.create_meeting = (req, res) => {
-    let new_meeting = new Meeting(req.body);
-    new_meeting.save((err, meeting) => {
-        if (err)
-            res.send(err);
-        res.json(meeting);
-    });
+exports.plannify_meetings =  async (req, res) => {
+    let meetings = new Meetings();
+    res.json(await meetings.plannifyMeetings());
 };
 
 /**
@@ -42,21 +39,6 @@ exports.get_meeting = (req, res) => {
         if (err)
             res.send(err);
         res.json(meeting);
-    });
-};
-
-/**
- * Get a meeting from id
- *
- * @param req
- * @param res
- */
-exports.get_meeting_detail = (req, res) => {
-    Meeting.findById(req.params.meetingId, (err, meeting) => {
-        if (err)
-            res.send(err);
-
-        //res.json(meeting);
     });
 };
 
@@ -91,5 +73,3 @@ exports.delete_meeting = (req, res) => {
             res.json({message: 'Meeting supprimé'});
         });
 };
-
-

@@ -23,8 +23,10 @@ module.exports = (app) => {
     /* Meeting */
 
     app.route('/meetings')
-        .get(meeting.list_meetings)
-        .post(meeting.create_meeting);
+        .get(meeting.list_meetings);
+
+    app.route('/meetings/plannify')
+        .get(meeting.plannify_meetings);
 
     app.route('/meetings/:meetingId')
         .get(meeting.get_meeting)
