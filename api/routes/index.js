@@ -6,7 +6,8 @@
  * @param app
  */
 module.exports = (app) => {
-    let user = require('../controller/userController'),
+    let settings = require('../controller/settingsController'),
+        user = require('../controller/userController'),
         meeting = require('../controller/meetingController');
 
 
@@ -32,4 +33,9 @@ module.exports = (app) => {
         .get(meeting.get_meeting)
         .put(meeting.update_meeting)
         .delete(meeting.delete_meeting);
+
+    /* Configuration */
+    app.route('/settings/')
+        .get(settings.get_settings)
+        .put(settings.update_settings);
 };

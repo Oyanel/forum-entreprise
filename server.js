@@ -7,9 +7,8 @@ let routes = require('./api/routes');
 /* mongodb */
 const {Connection} = require('./api/helper/mongodb');
 
-
-let app = express();
-let port = process.env.PORT || 3000;
+let app = express(),
+    port = process.env.PORT || 3000;
 
 /* models */
 let User = require('./api/model/User'),
