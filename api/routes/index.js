@@ -9,59 +9,102 @@ module.exports = (app) => {
     let settings = require('../controller/settingsController'),
         user = require('../controller/userController'),
         meeting = require('../controller/meetingController'),
-        passport = require('passport');
-
+        config = require('../../config'),
+        jwt = require('jsonwebtoken');
 
     /* User routes */
     app.route('/users')
-        .get(user.list_users)
-        .post(user.create_user);
+        .get(secured, user.list_users)
+        .post(securedAdmin, user.create_user);
 
     app.route('/users/:userId')
-        .get(user.get_user)
-        .put(user.update_user)
-        .delete(user.delete_user);
+        .get(secured, user.get_user)
+        .put(securedAdmin, user.update_user)
+        .delete(securedAdmin, user.delete_user);
 
     /* Meeting */
     app.route('/meetings')
-        .get(meeting.list_meetings);
+        .get(securedAdmin, meeting.list_meetings);
 
     app.route('/meetings/plannify')
-        .get(meeting.plannify_meetings);
+        .get(securedAdmin, meeting.plannify_meetings);
 
     app.route('/meetings/:meetingId')
-        .get(meeting.get_meeting)
-        .put(meeting.update_meeting)
-        .delete(meeting.delete_meeting);
+        .get(secured, meeting.get_meeting)
+        .put(securedAdmin, meeting.update_meeting)
+        .delete(securedAdmin, meeting.delete_meeting);
 
     /* Configuration */
     app.route('/settings/')
-        .get(settings.get_settings)
-        .put(settings.update_settings);
+        .get(securedAdmin, settings.get_settings)
+        .put(securedAdmin, settings.update_settings);
 
 
     /** authentification **/
 
     /* login */
     app.route('/login')
-        .post(passport.authenticate('local-login', (req, res) => {
-            res.json();
-        }));
+        .post(user.login);
 
-    /* logout */
-    app.route('/logout')
-        .get(isLoggedIn, (req, res) => {
-            req.logout();
-            res.status(200).json({
-                'message': 'successfully logout'
+    // route middleware to verify a token
+    function secured(req, res, next) {
+
+        // check header or url parameters or post parameters for token
+        let token = req.body.token || req.query.token || req.headers['x-access-token'];
+        // decode token
+        if (token) {
+            // verifies secret and checks exp
+            jwt.verify(token, config.token.secretKey, function (err, decoded) {
+                if (err)
+                    return res.json({success: false, message: 'Failed to authenticate token.'});
+
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
             });
-        });
+        } else {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
 
-    function isLoggedIn(req, res, next) {
-        if (req.isAuthenticated())
-            return next();
-        res.status(400).json({
-            'message': 'access denied'
-        });
+        }
     }
+
+    /**
+     * Admin route access controller
+     *
+     * @param req
+     * @param res
+     * @param next
+     */
+    function securedAdmin(req, res, next) {
+
+        // check header or url parameters or post parameters for token
+        let token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+        // decode token
+        if (token) {
+            // verifies secret and checks exp
+            jwt.verify(token, config.token.secretKey, async function (err, decoded) {
+                if (err)
+                    return res.json({success: false, message: 'Failed to authenticate token.'});
+
+                req.decoded = decoded;
+
+                let isAdmin = await user.isAdmin(decoded.id);
+                if (!isAdmin) {
+                    return res.json({success: false, message: 'Access denied.'});
+                }
+                next();
+            });
+        } else {
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        }
+
+    }
+
 };

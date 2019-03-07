@@ -1,13 +1,6 @@
 let express = require('express'),
-    bodyParser = require('body-parser'),
-    cookieParser = require('cookie-parser'),
-    config = require('./config'),
-    session = require('express-session'),
-    passport = require('passport');
-
-
-require('./api/config/passport')(passport);
-
+    cors = require('cors'),
+    bodyParser = require('body-parser');
 /* routes */
 let routes = require('./api/routes');
 
@@ -23,24 +16,18 @@ let User = require('./api/model/User'),
 
 Connection.connectToMongo();
 
-app.use(cookieParser());
+app.use(cors());
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-
-app.use(session({
-    secret: config.passport.secretKey,
-    resave: true,
-    saveUninitialized: true
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 routes(app);
 
 app.use(function (req, res) {
     res.status(404).send({url: req.originalUrl + ' not found'})
 });
+
+app.disable('etag');
 
 app.listen(port);
 
