@@ -9,7 +9,11 @@ Server node en REST pour l'application forum-entreprise dans le cadre d'un proje
 #### Environnement
 Mongodb : `sudo apt install -y mongod`
 
-Node : `sudo apt install nodejs`
+Node : `sudo apt install -y nodejs`
+
+Git : `sudo apt install -y git`
+
+Npm : `sudo apt install -y npm`
 
 
 ### SETUP
