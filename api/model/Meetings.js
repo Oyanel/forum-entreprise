@@ -47,9 +47,9 @@ class Meetings {
             });
 
             let appointements = sortedCompanies.splice(0, MAX_APPOINTEMENTS);
-            //@TODO: create the meeting strategy (date)
             Debugger.debug('applicant: ', key);
             Debugger.debug('appointements: ', appointements);
+
         }
         return !!this.error ? 'Les rendez-vous sont prêts (mais pas les heures -_-\')!' : this.error;
     };
@@ -58,7 +58,7 @@ class Meetings {
      * get the companies
      */
     async getCompanies() {
-        let users = User.find({user_type: "Company"}, (err, companies) => {
+        let users = await User.find({user_type: "Company"}, (err, companies) => {
             if (err)
                 return err;
             return companies;

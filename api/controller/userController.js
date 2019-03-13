@@ -93,21 +93,21 @@ exports.login = function (req, res) {
     }, function (err, user) {
 
         if (err)
-            res.send(err);
+            return res.send(err);
 
         if (!user)
-            res.json({success: false, message: 'Authentication failed. User not found.'});
+            return res.json({success: false, message: 'Authentication failed. User not found.'});
 
         // check if password matches
         if (!validPassword(req.body.password, user.password))
-            res.json({success: false, message: 'Authentication failed. Wrong password.'});
+            return res.json({success: false, message: 'Authentication failed. Wrong password.'});
 
         delete user.password;
 
         let token = jwt.sign({id: user._id}, config.token.secretKey);
 
         // return the information including token as JSON
-        res.json({
+        return res.json({
             success: true,
             user: user,
             token: token
