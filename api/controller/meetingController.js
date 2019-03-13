@@ -18,6 +18,21 @@ exports.list_meetings = (req, res) => {
 };
 
 /**
+ * Create a meeting
+ *
+ * @param req
+ * @param res
+ */
+exports.create_meeting = (req, res) => {
+    let new_meeting = new Meeting(req.body);
+    new_meeting.save((err, meeting) => {
+        if (err)
+            res.send(err);
+        res.json(meeting);
+    });
+};
+
+/**
  * Plannify meetings
  *
  * @param req
