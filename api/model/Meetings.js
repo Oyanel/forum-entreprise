@@ -7,6 +7,9 @@ let mongoose = require('mongoose'),
     User = mongoose.model('User');
 
 const MAX_PRIORITY = config.planning.max_rank;
+const START_TIME = config.planning.start_time;
+const END_TIME = config.planning.end_time;
+const MEETING_TIME = config.planning.time_meeting;
 
 /**
  * This class handle the meetings strategy
@@ -31,6 +34,9 @@ class Meetings {
         this.companies = await this.getCompanies();
         this.applicants = await this.getApplicants();
         let affinityMatrix = this.getAfinityMatrix();
+        let rdv = {};
+        let rdv_start_time = START_TIME;
+        let rdv_end_time = START_TIME + MEETING_TIME;
         const MAX_APPOINTEMENTS = Meetings.getMaxAppointments();
 
         // We loop on the applicants affinities
@@ -45,10 +51,12 @@ class Meetings {
                     delete sortedCompanies[company];
                 }
             });
+            Debugger.debug(sortedCompanies);
+            
 
-            let appointements = sortedCompanies.splice(0, MAX_APPOINTEMENTS);
-            Debugger.debug('applicant: ', key);
-            Debugger.debug('appointements: ', appointements);
+            // let appointements = sortedCompanies.splice(0, MAX_APPOINTEMENTS);
+            // Debugger.debug('applicant: ', key);
+            // Debugger.debug('appointements: ', appointements);
 
         }
         return !!this.error ? 'Les rendez-vous sont prêts (mais pas les heures -_-\')!' : this.error;
@@ -119,7 +127,7 @@ class Meetings {
             scoreCompany = rankCompany > 0 ? (rankCompany - 1) / (MAX_PRIORITY - 1) : 1,
             scoreApplicant = rankApplicant > 0 ? (rankApplicant - 1) / (MAX_PRIORITY - 1) : 1;
 
-        return (1 - (scoreApplicant + scoreCompany) / 2);
+        return 1 - (scoreApplicant + scoreCompany) / 2;
     }
 
     /**
@@ -145,7 +153,7 @@ class Meetings {
      * @returns {number}
      */
     static getMaxAppointments() {
-        return (config.planning.end_time - config.planning.start_time) / config.planning.time_meeting;
+        return (END_TIME - START_TIME) / MEETING_TIME;
     }
 }
 
