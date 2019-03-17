@@ -13,10 +13,16 @@ let mongoose = require('mongoose'),
  * @param res
  */
 exports.list_users = (req, res) => {
-    User.find({}, (err, user) => {
+    User.find({}, (err, users) => {
         if (err)
             res.send(err);
-        res.json(user);
+        users.forEach((user, index) => {
+            user.password = null;
+            if (user.user_type.localeCompare('Administrator') === 0)
+                users.splice(index, 1);
+        });
+        console.log(users);
+        res.json(users);
     });
 };
 
@@ -45,7 +51,7 @@ exports.get_user = (req, res) => {
     User.findById(req.params.userId, (err, user) => {
         if (err)
             res.send(err);
-        delete user.password;
+        user.password = null;
         res.json(user);
     });
 };
