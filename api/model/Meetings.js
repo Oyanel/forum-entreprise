@@ -41,7 +41,7 @@ class Meetings {
 
         const MAX_APPOINTEMENTS = Meetings.getMaxAppointments();
 
-        while(niteration < 2){
+        while(niteration < MAX_PRIORITY){
             Debugger.debug("Iteration " + niteration);
             Debugger.debug(rdv_start_time);
             Debugger.debug(rdv_end_time);
@@ -59,12 +59,15 @@ class Meetings {
                 });
                 let creneau_trouve = 0;
                 let compteur = 0;
-                while(creneau_trouve==0 && compteur < 4){
+                Debugger.debug("Recherche d'entreprise dispo");
+                while(creneau_trouve==0 && compteur < this.companies.length){
+                    Debugger.debug("tour " + compteur);
                     if(compteur < sortedCompanies.length){
+                        Debugger.debug("test freetime");
                         await this.isFreeTime(key, sortedCompanies[compteur], rdv_start_time).then(async (valeur)=>{  
                             if (valeur==1){
                                 creneau_trouve = 1;
-                                // Debugger.debug("Création meeting");
+                                Debugger.debug("Création meeting");
                                 // Debugger.debug(rdv_start_time);
                                 // Debugger.debug(rdv_end_time);
                                 // Debugger.debug(applicant);
@@ -92,7 +95,7 @@ class Meetings {
             niteration = niteration + 1;
 
         }
-        return !!this.error ? 'Les rendez-vous sont prêts (mais pas les heures -_-\')!' : this.error;
+        return !!this.error ? 'Les rendez-vous sont prêts !' : this.error;
     };
 
     /**
@@ -186,7 +189,7 @@ class Meetings {
      * @returns {number}
      */
     static getMaxAppointments() {
-        return (END_TIME - START_TIME) / MEETING_TIME;
+        return (END_TIME.getHours() - START_TIME.getHours()) / MEETING_TIME;
     }
 
     /**
