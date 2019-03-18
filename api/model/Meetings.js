@@ -7,8 +7,8 @@ let mongoose = require('mongoose'),
     User = mongoose.model('User');
 
 const MAX_PRIORITY = config.planning.max_rank;
-const START_TIME = config.planning.start_time;
-const END_TIME = config.planning.end_time;
+const START_TIME = new Date(2019, 3, 18, config.planning.start_time, 0, 0);
+const END_TIME = new Date(2019, 3, 18, config.planning.end_time, 0, 0);
 const MEETING_TIME = config.planning.time_meeting;
 
 /**
@@ -34,9 +34,11 @@ class Meetings {
         this.companies = await this.getCompanies();
         this.applicants = await this.getApplicants();
         let affinityMatrix = this.getAfinityMatrix();
-        let rdv = {};
+        let rdvs = {};
         let rdv_start_time = START_TIME;
-        let rdv_end_time = START_TIME + MEETING_TIME;
+        let rdv_end_time = new Date(2019, 3, 18, rdv_start_time.getHours(), 30, 0);
+        Debugger.debug(rdv_start_time);
+        Debugger.debug(rdv_end_time);
         const MAX_APPOINTEMENTS = Meetings.getMaxAppointments();
 
         // We loop on the applicants affinities
@@ -51,7 +53,16 @@ class Meetings {
                     delete sortedCompanies[company];
                 }
             });
-            Debugger.debug(sortedCompanies);
+            
+            let isfreetime = await this.isFreeTime(sortedCompanies[0], rdv_start_time);
+            if(isfreetime==1){
+                Debugger.debug(key);
+                let new_meeting = new  Meeting({start_date: rdv_start_time, end_date: rdv_end_time, applicant: key, company: sortedCompanies[0], description: "test"}); //.setMinutes(Date.now().getMinutes() + 30)
+                new_meeting.save();
+                
+                
+            }
+            
             
 
             // let appointements = sortedCompanies.splice(0, MAX_APPOINTEMENTS);
@@ -59,6 +70,9 @@ class Meetings {
             // Debugger.debug('appointements: ', appointements);
 
         }
+
+        rdv_start_time = rdv_end_time;
+        rdv_end_time = new Date(2019, 3, 18, rdv_start_time.getHours(), rdv_start_time.getMinutes() + 30, 0);
         return !!this.error ? 'Les rendez-vous sont prêts (mais pas les heures -_-\')!' : this.error;
     };
 
@@ -103,7 +117,7 @@ class Meetings {
             affinityMatrix[applicant._id] = companyArray;
         });
 
-        Debugger.debug(affinityMatrix);
+        // Debugger.debug(affinityMatrix);
 
         return affinityMatrix;
     }
@@ -155,6 +169,30 @@ class Meetings {
     static getMaxAppointments() {
         return (END_TIME - START_TIME) / MEETING_TIME;
     }
+
+    /**
+     * Return a boolean
+     * 
+     * @param company
+     * @param start_time
+     * @returns {Promise<Object>}
+     */
+    async isFreeTime(company, start_time){
+        let meetings = await this.findMeetingsByCompany(company),
+            output = 1;
+        
+        meetings.forEach(meeting => {
+            Debugger.debug(meeting.start_date);
+            if (meeting.start_date == start_time) {
+                Debugger.debug("conflit");
+                output = 0;
+            }
+        });
+        
+        return Promise.resolve(output);
+
+    }
+
 }
 
 module.exports = Meetings;
