@@ -25,7 +25,7 @@ let UserSchema = new Schema({
     },
     wish_list: {
         type: Array,
-        default: []
+        default: [{}]
     },
     user_type: {
         type: String,
