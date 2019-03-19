@@ -91,7 +91,7 @@ class Meetings {
 
             rdv_start_time = rdv_end_time;
             rdv_end_time = new Date(2019, 3, 18, rdv_start_time.getHours(), rdv_start_time.getMinutes() + 30, 0);
-            
+            this.shuffle(affinityMatrix);
             niteration = niteration + 1;
 
         }
@@ -212,6 +212,17 @@ class Meetings {
         
         return Promise.resolve(output);
 
+    }
+
+    shuffle(a) {
+        var j, x, i;
+        for (i = a.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            x = a[i];
+            a[i] = a[j];
+            a[j] = x;
+        }
+        return a;
     }
 
 }
