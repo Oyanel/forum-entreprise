@@ -15,13 +15,12 @@ let mongoose = require('mongoose'),
 exports.list_users = (req, res) => {
     User.find({}, (err, users) => {
         if (err)
-            res.send(err);
+            return res.send(err);
         users.forEach((user, index) => {
             user.password = null;
             if (user.user_type.localeCompare('Administrator') === 0)
                 users.splice(index, 1);
         });
-        console.log(users);
         res.json(users);
     });
 };
@@ -36,8 +35,8 @@ exports.create_user = (req, res) => {
     let new_user = new User(req.body);
     new_user.save((err, user) => {
         if (err)
-            res.send(err);
-        res.json(user);
+            return res.send({success: false, error: err});
+        res.json({success: true, message: 'user created'});
     });
 };
 
@@ -50,7 +49,7 @@ exports.create_user = (req, res) => {
 exports.get_user = (req, res) => {
     User.findById(req.params.userId, (err, user) => {
         if (err)
-            res.send(err);
+            return res.send(err);
         user.password = null;
         res.json(user);
     });
@@ -65,7 +64,7 @@ exports.get_user = (req, res) => {
 exports.update_user = (req, res) => {
     User.findOneAndUpdate({_id: req.params.userId}, req.body, {new: true}, (err, user) => {
         if (err)
-            res.send(err);
+            return res.send(err);
         res.json(user);
     });
 };
@@ -83,7 +82,7 @@ exports.delete_user = (req, res) => {
         },
         (err, user) => {
             if (err)
-                res.send(err);
+                return res.send(err);
             res.json({message: 'User supprimé'});
         });
 };

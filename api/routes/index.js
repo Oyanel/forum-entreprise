@@ -19,12 +19,13 @@ module.exports = (app) => {
 
     app.route('/users/:userId')
         .get(secured, user.get_user)
-        .put(securedAdmin, user.update_user)
+        .put(secured, user.update_user)
         .delete(securedAdmin, user.delete_user);
 
     /* Meeting */
     app.route('/meetings')
-        .get(securedAdmin, meeting.list_meetings);
+        .get(secured, meeting.list_meetings)
+        .delete(securedAdmin, meeting.delete_meetings);
 
     app.route('/meetings/plannify')
         .get(securedAdmin, meeting.plannify_meetings);

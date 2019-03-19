@@ -12,7 +12,7 @@ let mongoose = require('mongoose'),
 exports.list_meetings = (req, res) => {
     Meeting.find({}, (err, meetings) => {
         if (err)
-            res.send(err);
+            return res.send(err);
         res.json(meetings);
     });
 };
@@ -27,7 +27,7 @@ exports.create_meeting = (req, res) => {
     let new_meeting = new Meeting(req.body);
     new_meeting.save((err, meeting) => {
         if (err)
-            res.send(err);
+            return res.send(err);
         res.json(meeting);
     });
 };
@@ -52,7 +52,7 @@ exports.plannify_meetings =  async (req, res) => {
 exports.get_meeting = (req, res) => {
     Meeting.findById(req.params.meetingId, (err, meeting) => {
         if (err)
-            res.send(err);
+            return res.send(err);
         res.json(meeting);
     });
 };
@@ -66,7 +66,7 @@ exports.get_meeting = (req, res) => {
 exports.update_meeting = (req, res) => {
     Meeting.findOneAndUpdate({_id: req.params.meetingId}, req.body, {new: true}, (err, meeting) => {
         if (err)
-            res.send(err);
+            return res.send(err);
         res.json(meeting);
     });
 };
@@ -84,7 +84,22 @@ exports.delete_meeting = (req, res) => {
         },
         (err, meeting) => {
             if (err)
-                res.send(err);
+                return res.send(err);
             res.json({message: 'Meeting supprimé'});
+        });
+};
+
+/**
+ * Delete all meetings
+ *
+ * @param req
+ * @param res
+ */
+exports.delete_meetings = (req, res) => {
+    Meeting.remove({},
+        (err) => {
+            if (err)
+                return res.send(err);
+            res.json({message: 'Meetings supprimés'});
         });
 };
