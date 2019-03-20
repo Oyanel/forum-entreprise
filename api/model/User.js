@@ -3,7 +3,7 @@ let mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     generator = require('generate-password'),
     bcrypt = require('bcrypt-nodejs');
-
+const {Mailer} = require('../helper/mailer');
 
 let UserSchema = new Schema({
     _id: {
@@ -18,11 +18,7 @@ let UserSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
-        default: generator.generate({
-            length: 10,
-            numbers: true
-        })
+        required: true
     },
     account: {
         type: Object,
@@ -44,8 +40,14 @@ UserSchema.methods.generateHash = function (password) {
 };
 
 UserSchema.pre('save', function (next) {
-    // @TODO send password;
     let user = this;
+
+    this.password = generator.generate({
+        length: 10,
+        numbers: true
+    });
+    Mailer.sendPassword(this.email, Mailer.PASSWORD_REQUEST, this.password);
+
     if (user.password) {
         this.password = UserSchema.methods.generateHash(user.password);
     }
