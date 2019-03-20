@@ -13,6 +13,7 @@ let mongoose = require('mongoose'),
  * @param res
  */
 exports.list_users = (req, res) => {
+    console.log(User);
     User.find({}, (err, users) => {
         if (err)
             return res.send(err);
@@ -38,6 +39,7 @@ exports.create_user = (req, res) => {
             console.log(err);
             return res.send({success: false, error: err});
         }
+        console.log(user);
         res.json({success: true, message: 'user created'});
     });
 };
@@ -87,6 +89,23 @@ exports.delete_user = (req, res) => {
                 return res.send(err);
             res.json({message: 'User supprimé'});
         });
+};
+
+/**
+ * Renew user password
+ *
+ * @param req
+ * @param res
+ */
+exports.renew_password = (req, res) => {
+    User.findById(req.params.userId, (err, user) => {
+        if (err) {
+            console.log(err);
+            return res.send(err);
+        }
+        user.generatePassword(user);
+        res.json({message: 'Nouveau mot de passe créé'});
+    });
 };
 
 /**

@@ -22,6 +22,9 @@ module.exports = (app) => {
         .put(secured, user.update_user)
         .delete(securedAdmin, user.delete_user);
 
+    app.route('/users/password/:userId')
+        .get(securedAdmin, user.renew_password);
+
     /* Meeting */
     app.route('/meetings')
         .get(secured, meeting.list_meetings)

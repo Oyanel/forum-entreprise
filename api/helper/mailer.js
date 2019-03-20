@@ -2,7 +2,7 @@ let nodemailer = require('nodemailer'),
     config = require('../../config');
 
 const PASSWORD_REQUEST =
-    "<h2>Forum Entreprise Polytech</h2>\n\n" +
+    "<h2>Forum Entreprise Polytech</h2></br>" +
     "<p>Bonjour,</br>Voici votre mot de passe pour le forum entreprise Polytech : %password%</br></p>";
 
 let transport = nodemailer.createTransport({
