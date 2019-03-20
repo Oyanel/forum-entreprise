@@ -1,5 +1,9 @@
 'use strict';
 
+let multer = require('multer');
+const fetch = require('fetch-base64'),
+fileSystem = require('fs');
+
 /**
  * Routes
  *
@@ -10,12 +14,19 @@ module.exports = (app) => {
         user = require('../controller/userController'),
         meeting = require('../controller/meetingController'),
         config = require('../../config'),
-        jwt = require('jsonwebtoken');
+        jwt = require('jsonwebtoken'),
+        DIR = '/fichiers/',
+        storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+                cb(null, DIR)
+            }
+        }),
+        upload = multer({ storage: storage });
 
     /* User routes */
     app.route('/users')
         .get(secured, user.list_users)
-        .post(securedAdmin, user.create_user);
+        .post(user.create_user);
 
     app.route('/users/:userId')
         .get(secured, user.get_user)
@@ -49,6 +60,34 @@ module.exports = (app) => {
     /* login */
     app.route('/login')
         .post(user.login);
+
+    app.route('/upload')
+        .post(uploadFile);
+
+    app.route('/getFile/:fileName')
+        .get(getFile);
+
+    function uploadFile(req, res) {
+        upload(req, res, function (err) {
+            if (err) {
+                return res.end(err.toString());
+            }
+            res.end('File uploaded');
+        });
+    }
+
+    function getFile(req, res) {
+        var filePath = 'fichiers/' + req.params.fileName;
+        var stat = fileSystem.statSync(filePath);
+
+        res.writeHead(200, {
+            'Content-Type': 'application/pdf'
+        });
+
+        var readStream = fileSystem.createReadStream(filePath);
+        // We replaced all the event handlers with a simple call to readStream.pipe()
+        readStream.pipe(res);
+    }
 
     // route middleware to verify a token
     function secured(req, res, next) {
