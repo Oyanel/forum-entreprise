@@ -13,7 +13,6 @@ let mongoose = require('mongoose'),
  * @param res
  */
 exports.list_users = (req, res) => {
-    console.log(User);
     User.find({}, (err, users) => {
         if (err)
             return res.send(err);

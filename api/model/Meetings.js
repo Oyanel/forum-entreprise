@@ -7,8 +7,6 @@ let mongoose = require('mongoose'),
     User = mongoose.model('User');
 
 const MAX_PRIORITY = config.planning.max_rank;
-const START_TIME = new Date(2019, 3, 18, config.planning.start_time, 0, 0);
-const END_TIME = new Date(2019, 3, 18, config.planning.end_time, 0, 0);
 const MEETING_TIME = config.planning.time_meeting;
 
 
@@ -17,8 +15,9 @@ const MEETING_TIME = config.planning.time_meeting;
  */
 class Meetings {
 
-    
+
     constructor() {
+        console.log('construct');
         if (this.instance) {
             return this.instance;
         }
@@ -33,6 +32,10 @@ class Meetings {
      *
      */
     async plannifyMeetings() {
+
+        let START_TIME = new Date(2019, 3, 18, config.planning.start_time, 0, 0);
+
+        console.log(config.planning);
         this.companies = await this.getCompanies();
         this.applicants = await this.getApplicants();
         let affinityMatrix = this.getAfinityMatrix();
@@ -43,7 +46,7 @@ class Meetings {
 
         const MAX_APPOINTEMENTS = Meetings.getMaxAppointments();
 
-        while(niteration < MAX_PRIORITY){
+        while (niteration < MAX_PRIORITY) {
             Debugger.debug("Iteration " + niteration);
             Debugger.debug(rdv_start_time);
             Debugger.debug(rdv_end_time);
@@ -62,28 +65,32 @@ class Meetings {
                 let creneau_trouve = 0;
                 let compteur = 0;
                 Debugger.debug("Recherche d'entreprise dispo");
-                while(creneau_trouve==0 && compteur < this.companies.length){
+                while (creneau_trouve == 0 && compteur < this.companies.length) {
                     Debugger.debug("tour " + compteur);
-                    if(compteur < sortedCompanies.length){
+                    if (compteur < sortedCompanies.length) {
                         Debugger.debug("test freetime");
-                        await this.isFreeTime(key, sortedCompanies[compteur], rdv_start_time).then(async (valeur)=>{  
-                            if (valeur==1){
+                        await this.isFreeTime(key, sortedCompanies[compteur], rdv_start_time).then(async (valeur) => {
+                            if (valeur == 1) {
                                 creneau_trouve = 1;
                                 Debugger.debug("Création meeting");
                                 // Debugger.debug(rdv_start_time);
                                 // Debugger.debug(rdv_end_time);
                                 // Debugger.debug(applicant);
                                 // Debugger.debug(sortedCompanies[niteration + compteur]);
-                                let new_meeting = new  Meeting({start_date: rdv_start_time, end_date: rdv_end_time, applicant: key, company: sortedCompanies[compteur], description: "test"}); //.setMinutes(Date.now().getMinutes() + 30)
+                                let new_meeting = new Meeting({
+                                    start_date: rdv_start_time,
+                                    end_date: rdv_end_time,
+                                    applicant: key,
+                                    company: sortedCompanies[compteur],
+                                    description: "test"
+                                }); //.setMinutes(Date.now().getMinutes() + 30)
                                 await new_meeting.save();
                             }
                         });
                     }
                     compteur = compteur + 1;
                 }
-                
-                
-                
+
 
                 // let appointements = sortedCompanies.splice(0, MAX_APPOINTEMENTS);
                 // Debugger.debug('applicant: ', key);
@@ -95,7 +102,7 @@ class Meetings {
             rdv_end_time = new Date(2019, 3, 18, rdv_start_time.getHours(), rdv_start_time.getMinutes() + 30, 0);
             //Debugger.debug(this.applicants);
             affinityMatrix = await this.shuffle(affinityMatrix);
-            
+
             niteration = niteration + 1;
 
         }
@@ -195,27 +202,29 @@ class Meetings {
      * @returns {number}
      */
     static getMaxAppointments() {
+        let END_TIME = new Date(2019, 3, 18, config.planning.end_time, 0, 0);
+        let START_TIME = new Date(2019, 3, 18, config.planning.start_time, 0, 0);
         return (END_TIME.getHours() - START_TIME.getHours()) / MEETING_TIME;
     }
 
     /**
      * Return a boolean
-     * 
+     *
      * @param company
      * @param start_time
      * @returns {Promise<Object>}
      */
-    async isFreeTime(applicant, company, start_time){
+    async isFreeTime(applicant, company, start_time) {
         let meetings = await this.findMeetingsByCompany(company),
             output = 1;
-        
+
         await meetings.forEach(async meeting => {
             if ((meeting.start_date.getHours() == start_time.getHours() && meeting.start_date.getMinutes() == start_time.getMinutes())
                 || meeting.applicant == applicant) {
                 output = 0;
             }
         });
-        
+
         return Promise.resolve(output);
 
     }
@@ -224,41 +233,45 @@ class Meetings {
         var keys = Object.keys(a);
         let aShuffled = {};
 
-        keys.sort(function(a,b) {return Math.floor(Math.random() * (keys.length + 1));});
-        keys.forEach(key => {aShuffled[key]=a[key]});
+        keys.sort(function (a, b) {
+            return Math.floor(Math.random() * (keys.length + 1));
+        });
+        keys.forEach(key => {
+            aShuffled[key] = a[key]
+        });
         Debugger.debug(aShuffled);
         return aShuffled;
     }
 
-    async addNoneMeetings(companies, applicants){
+    async addNoneMeetings(companies, applicants) {
 
-        
 
-        await companies.forEach(async company =>{
+        await companies.forEach(async company => {
             let test_time = START_TIME;
             let meetings = await this.findMeetingsByCompany(company);
-            meetings.sort(function(a, b) {
+            meetings.sort(function (a, b) {
                 a = new Date(a.start_date);
                 b = new Date(b.start_date);
-                return a>b ? 1 : a<b ? -1 : 0;
+                return a > b ? 1 : a < b ? -1 : 0;
             });
             await meetings.forEach(async meeting => {
-                if(!(meeting.start_date.getHours() == test_time.getHours() && meeting.start_date.getMinutes() == test_time.getMinutes())){
+                if (!(meeting.start_date.getHours() == test_time.getHours() && meeting.start_date.getMinutes() == test_time.getMinutes())) {
                     Debugger.debug("Création meeting vide");
-                    let new_meeting = new  Meeting({
-                        start_date: test_time, 
-                        end_date: new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0), 
-                        company: company, 
-                        description: "meeting vide"});
+                    let new_meeting = new Meeting({
+                        start_date: test_time,
+                        end_date: new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0),
+                        company: company,
+                        applicant: null,
+                        description: "meeting vide"
+                    });
                     await new_meeting.save();
                 }
-                test_time=new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0);
+                test_time = new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0);
             });
             // Debugger.debug(meetings);
         });
-        
-    }
 
+    }
 
 
 }

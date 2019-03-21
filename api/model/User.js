@@ -53,7 +53,7 @@ UserSchema.methods.generatePassword = function (user) {
 };
 
 UserSchema.pre('save', function (next) {
-    this.password = UserSchema.static.generatePassword(this);
+    this.password = this.generatePassword(this);
     next();
 });
 

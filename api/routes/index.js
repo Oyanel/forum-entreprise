@@ -1,8 +1,7 @@
 'use strict';
 
 let multer = require('multer');
-const fetch = require('fetch-base64'),
-fileSystem = require('fs');
+const fileSystem = require('fs');
 
 /**
  * Routes
@@ -21,7 +20,7 @@ module.exports = (app) => {
                 cb(null, DIR)
             }
         }),
-        upload = multer({ storage: storage });
+        upload = multer({storage: storage});
 
     /* User routes */
     app.route('/users')
@@ -77,14 +76,14 @@ module.exports = (app) => {
     }
 
     function getFile(req, res) {
-        var filePath = 'fichiers/' + req.params.fileName;
-        var stat = fileSystem.statSync(filePath);
+        let filePath = 'fichiers/' + req.params.fileName;
+        let stat = fileSystem.statSync(filePath);
 
         res.writeHead(200, {
             'Content-Type': 'application/pdf'
         });
 
-        var readStream = fileSystem.createReadStream(filePath);
+        let readStream = fileSystem.createReadStream(filePath);
         // We replaced all the event handlers with a simple call to readStream.pipe()
         readStream.pipe(res);
     }
