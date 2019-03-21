@@ -251,24 +251,6 @@ class Meetings {
             });
             // Debugger.debug(meetings);
         });
-
-        await applicants.forEach(async applicant =>{
-            let test_time = START_TIME;
-            let meetings = await this.findMeetingsByCompany(company);
-            await meetings.forEach(async meeting => {
-                if(!(meeting.start_date.getHours() == test_time.getHours() && meeting.start_date.getMinutes() == test_time.getMinutes())){
-                    Debugger.debug("Création meeting vide");
-                    let new_meeting = new  Meeting({
-                        start_date: test_time, 
-                        end_date: new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0), 
-                        company: company, 
-                        description: "meeting vide"});
-                    await new_meeting.save();
-                }
-                test_time=new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0);
-            });
-            // Debugger.debug(meetings);
-        });
         
     }
 
