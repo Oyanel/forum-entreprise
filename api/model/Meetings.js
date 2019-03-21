@@ -11,11 +11,13 @@ const START_TIME = new Date(2019, 3, 18, config.planning.start_time, 0, 0);
 const END_TIME = new Date(2019, 3, 18, config.planning.end_time, 0, 0);
 const MEETING_TIME = config.planning.time_meeting;
 
+
 /**
  * This class handle the meetings strategy
  */
 class Meetings {
 
+    
     constructor() {
         if (this.instance) {
             return this.instance;
@@ -53,7 +55,7 @@ class Meetings {
                 await sortedCompanies.forEach(async company => {
                     //then we check if the max number of meeting is yet reached
                     let meetings = await this.findMeetingsByCompany(company);
-                    if (meetings.length > MAX_PRIORITY) {
+                    if (meetings.length > MAX_APPOINTEMENTS) {
                         delete sortedCompanies[company];
                     }
                 });
@@ -91,10 +93,13 @@ class Meetings {
 
             rdv_start_time = rdv_end_time;
             rdv_end_time = new Date(2019, 3, 18, rdv_start_time.getHours(), rdv_start_time.getMinutes() + 30, 0);
-            this.shuffle(affinityMatrix);
+            //Debugger.debug(this.applicants);
+            affinityMatrix = await this.shuffle(affinityMatrix);
+            
             niteration = niteration + 1;
 
         }
+        this.addNoneMeetings(this.companies, this.applicants);
         return !!this.error ? 'Les rendez-vous sont prêts !' : this.error;
     };
 
@@ -181,6 +186,7 @@ class Meetings {
         return Promise.resolve(meetings);
     }
 
+
     /**
      * Return the maximum number of appointements for a day.
      * Takes in account the config file
@@ -214,16 +220,59 @@ class Meetings {
 
     }
 
-    shuffle(a) {
-        var j, x, i;
-        for (i = a.length - 1; i > 0; i--) {
-            j = Math.floor(Math.random() * (i + 1));
-            x = a[i];
-            a[i] = a[j];
-            a[j] = x;
-        }
-        return a;
+    async shuffle(a) {
+        var keys = Object.keys(a);
+        let aShuffled = {};
+
+        keys.sort(function(a,b) {return Math.floor(Math.random() * (keys.length + 1));});
+        keys.forEach(key => {aShuffled[key]=a[key]});
+        Debugger.debug(aShuffled);
+        return aShuffled;
     }
+
+    async addNoneMeetings(companies, applicants){
+
+        
+
+        await companies.forEach(async company =>{
+            let test_time = START_TIME;
+            let meetings = await this.findMeetingsByCompany(company);
+            await meetings.forEach(async meeting => {
+                if(!(meeting.start_date.getHours() == test_time.getHours() && meeting.start_date.getMinutes() == test_time.getMinutes())){
+                    Debugger.debug("Création meeting vide");
+                    let new_meeting = new  Meeting({
+                        start_date: test_time, 
+                        end_date: new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0), 
+                        company: company, 
+                        description: "meeting vide"});
+                    await new_meeting.save();
+                }
+                test_time=new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0);
+            });
+            // Debugger.debug(meetings);
+        });
+
+        await applicants.forEach(async applicant =>{
+            let test_time = START_TIME;
+            let meetings = await this.findMeetingsByCompany(company);
+            await meetings.forEach(async meeting => {
+                if(!(meeting.start_date.getHours() == test_time.getHours() && meeting.start_date.getMinutes() == test_time.getMinutes())){
+                    Debugger.debug("Création meeting vide");
+                    let new_meeting = new  Meeting({
+                        start_date: test_time, 
+                        end_date: new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0), 
+                        company: company, 
+                        description: "meeting vide"});
+                    await new_meeting.save();
+                }
+                test_time=new Date(2019, 3, 18, test_time.getHours(), test_time.getMinutes() + 30, 0);
+            });
+            // Debugger.debug(meetings);
+        });
+        
+    }
+
+
 
 }
 
