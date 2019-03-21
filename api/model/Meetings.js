@@ -237,6 +237,11 @@ class Meetings {
         await companies.forEach(async company =>{
             let test_time = START_TIME;
             let meetings = await this.findMeetingsByCompany(company);
+            meetings.sort(function(a, b) {
+                a = new Date(a.start_date);
+                b = new Date(b.start_date);
+                return a>b ? 1 : a<b ? -1 : 0;
+            });
             await meetings.forEach(async meeting => {
                 if(!(meeting.start_date.getHours() == test_time.getHours() && meeting.start_date.getMinutes() == test_time.getMinutes())){
                     Debugger.debug("Création meeting vide");

@@ -13,6 +13,11 @@ exports.list_meetings = (req, res) => {
     Meeting.find({}, (err, meetings) => {
         if (err)
             return res.send(err);
+        meetings.sort(function(a, b) {
+            a = new Date(a.start_date);
+            b = new Date(b.start_date);
+            return a>b ? 1 : a<b ? -1 : 0;
+        });
         res.json(meetings);
     });
 };
