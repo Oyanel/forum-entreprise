@@ -16,7 +16,7 @@ let User = require('./api/model/User'),
 
 Connection.connectToMongo();
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: 'http://localhost:4200' }));
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());

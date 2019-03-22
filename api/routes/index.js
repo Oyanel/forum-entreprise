@@ -1,8 +1,5 @@
 'use strict';
 
-let multer = require('multer');
-const fileSystem = require('fs');
-
 /**
  * Routes
  *
@@ -14,13 +11,20 @@ module.exports = (app) => {
         meeting = require('../controller/meetingController'),
         config = require('../../config'),
         jwt = require('jsonwebtoken'),
-        DIR = '/fichiers/',
+        multer = require('multer'),
+        crypto = require('crypto'),
+        fs = require('fs'),
+        DIR = 'fichiers/',
         storage = multer.diskStorage({
-            destination: function (req, file, cb) {
+            destination: function(req, file, cb) {
                 cb(null, DIR)
+            },
+            filename: function(req, file, cb) {
+                crypto.pseudoRandomBytes(16, function(err, raw) {
+                    cb(null, file.originalname);
+                });
             }
-        }),
-        upload = multer({storage: storage});
+        });
 
     /* User routes */
     app.route('/users')
@@ -60,30 +64,31 @@ module.exports = (app) => {
     app.route('/login')
         .post(user.login);
 
-    app.route('/upload')
+    app.route('/api/upload')
         .post(uploadFile);
 
     app.route('/getFile/:fileName')
         .get(getFile);
 
     function uploadFile(req, res) {
+        let upload = multer({ storage: storage }).any();
         upload(req, res, function (err) {
             if (err) {
                 return res.end(err.toString());
             }
-            res.end('File uploaded');
+
+            res.end('File is uploaded');
         });
     }
 
     function getFile(req, res) {
-        let filePath = 'fichiers/' + req.params.fileName;
-        let stat = fileSystem.statSync(filePath);
+        if (req.params.fileName === null || req.params.fileName === undefined) {
+            res.end('Fichier non trouvé');
+        }
+        var filePath = 'fichiers/' + req.params.fileName;
 
-        res.writeHead(200, {
-            'Content-Type': 'application/pdf'
-        });
 
-        let readStream = fileSystem.createReadStream(filePath);
+        let readStream = fs.createReadStream(filePath);
         // We replaced all the event handlers with a simple call to readStream.pipe()
         readStream.pipe(res);
     }
